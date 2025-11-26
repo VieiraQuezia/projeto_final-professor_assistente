@@ -7,7 +7,7 @@ import { Expectativas } from './pages/Expectativas';
 import { Exercicios } from './pages/Exercicios';
 import { AssistenteIA } from './pages/AssistenteIA';
 import { Sobre } from './pages/Sobre';
-export function App() {
+export default function App() {
   return <BrowserRouter>
       <div className="flex flex-col min-h-screen">
         <Navbar />

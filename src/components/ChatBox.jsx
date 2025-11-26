@@ -1,8 +1,8 @@
 // ...existing code...
-import React from 'react';
-import { Send } from 'lucide-react';
+import React from "react";
+import { Send } from "lucide-react";
 
-export function ChatBox({ messages, input, onInputChange, onSend, isLoading }) {
+export default function ChatBox({ messages, input, onInputChange, onSend, isLoading }) {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();

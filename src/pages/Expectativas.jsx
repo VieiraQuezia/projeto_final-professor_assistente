@@ -88,7 +88,7 @@ const externalLinks = [{
   }]
 }];
 
-export function Expectativas() {
+export default function Expectativas() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGrade, setSelectedGrade] = useState(null);
 

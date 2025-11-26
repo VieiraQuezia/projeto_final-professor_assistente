@@ -1,8 +1,8 @@
 // ...existing code...
-import React from 'react';
-import { Search } from 'lucide-react';
+import React from "react";
+import { Search } from "lucide-react";
 
-export function SearchBar({ value, onChange, placeholder = 'Buscar...' }) {
+export default function SearchBar({ value, onChange, placeholder = 'Buscar...' }) {
   return (
     <div className="relative w-full max-w-2xl">
       <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />

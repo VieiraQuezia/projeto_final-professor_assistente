@@ -1,9 +1,9 @@
 // ...existing code...
-import React, { useState } from 'react';
-import { ExerciseCard } from '../components/ExerciseCard';
-import { Plus } from 'lucide-react';
+import React, { useState } from "react";
+import { ExerciseCard } from "../components/ExerciseCard";
+import { Plus } from "lucide-react";
 
-export function Exercicios() {
+export default function Exercicios() {
   const [exercises, setExercises] = useState([{
     id: '1',
     title: 'Present Simple Quiz',

@@ -1,8 +1,8 @@
 // ...existing code...
-import React from 'react';
-import { BookOpen, Users, Target, Github } from 'lucide-react';
+import React from "react";
+import { BookOpen, Users, Target, Github } from "lucide-react";
 
-export function Sobre() {
+export default function Sobre() {
   const scrumPhases = [
     {
       title: 'Sprint 1 - Planejamento',
