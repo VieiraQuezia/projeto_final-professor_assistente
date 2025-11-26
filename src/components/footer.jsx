@@ -1,5 +1,7 @@
+// ...existing code...
 import React from 'react';
 import { Github } from 'lucide-react';
+
 export function Footer() {
   return <footer className="bg-[#0D47A1] text-white py-8 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,3 +27,4 @@ export function Footer() {
       </div>
     </footer>;
 }
+// ...existing code...

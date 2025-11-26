@@ -2,13 +2,9 @@ import React, { useState } from 'react';
 import { SearchBar } from '../components/SearchBar';
 import { ExpectativaCard } from '../components/ExpectativaCard';
 import { ExternalLink } from 'lucide-react';
-interface Expectativa {
-  id: string;
-  keyword: string;
-  description: string;
-  grade: string;
-}
-const mockExpectativas: Expectativa[] = [{
+// ...existing code...
+
+const mockExpectativas = [{
   id: '1',
   keyword: 'Present Simple',
   description: 'Compreender e utilizar o tempo verbal Present Simple para descrever rotinas, hábitos e fatos gerais.',
@@ -49,6 +45,7 @@ const mockExpectativas: Expectativa[] = [{
   description: 'Produzir textos argumentativos e dissertativos seguindo estruturas acadêmicas.',
   grade: '9'
 }];
+
 const externalLinks = [{
   grade: '6º ano',
   links: [{
@@ -86,15 +83,20 @@ const externalLinks = [{
     url: 'https://www.coursera.org'
   }]
 }];
+
 export function Expectativas() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
+  const [selectedGrade, setSelectedGrade] = useState(null);
+
   const filteredExpectativas = mockExpectativas.filter(exp => {
-    const matchesSearch = exp.keyword.toLowerCase().includes(searchTerm.toLowerCase()) || exp.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const lower = searchTerm.toLowerCase();
+    const matchesSearch = exp.keyword.toLowerCase().includes(lower) || exp.description.toLowerCase().includes(lower);
     const matchesGrade = !selectedGrade || exp.grade === selectedGrade;
     return matchesSearch && matchesGrade;
   });
+
   const grades = ['6', '7', '8', '9'];
+
   return <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">

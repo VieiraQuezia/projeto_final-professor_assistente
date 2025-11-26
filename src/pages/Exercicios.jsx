@@ -1,14 +1,10 @@
+// ...existing code...
 import React, { useState } from 'react';
 import { ExerciseCard } from '../components/ExerciseCard';
 import { Plus } from 'lucide-react';
-interface Exercise {
-  id: string;
-  title: string;
-  url: string;
-  addedDate: string;
-}
+
 export function Exercicios() {
-  const [exercises, setExercises] = useState<Exercise[]>([{
+  const [exercises, setExercises] = useState([{
     id: '1',
     title: 'Present Simple Quiz',
     url: 'https://wordwall.net/resource/123456',
@@ -19,11 +15,13 @@ export function Exercicios() {
     url: 'https://wordwall.net/resource/234567',
     addedDate: '10/01/2024'
   }]);
+
   const [newTitle, setNewTitle] = useState('');
   const [newUrl, setNewUrl] = useState('');
+
   const handleAddExercise = () => {
     if (!newTitle.trim() || !newUrl.trim()) return;
-    const newExercise: Exercise = {
+    const newExercise = {
       id: Date.now().toString(),
       title: newTitle,
       url: newUrl,
@@ -33,9 +31,11 @@ export function Exercicios() {
     setNewTitle('');
     setNewUrl('');
   };
-  const handleDeleteExercise = (id: string) => {
+
+  const handleDeleteExercise = (id) => {
     setExercises(exercises.filter(ex => ex.id !== id));
   };
+
   return <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
@@ -81,3 +81,4 @@ export function Exercicios() {
       </div>
     </div>;
 }
+// ...existing code...
