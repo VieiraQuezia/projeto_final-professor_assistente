@@ -2,49 +2,53 @@ import React, { useState } from 'react';
 import { SearchBar } from '../components/SearchBar';
 import { ExpectativaCard } from '../components/ExpectativaCard';
 import { ExternalLink } from 'lucide-react';
-// ...existing code...
+import {
+  habilidades6a9,
+  habilidades9,
+  habilidades8e9
+} from '../components/expectativasData';
+const parseGradesFromNumero = (numero) => {
+  if (!numero) return [];
+  // tenta detectar intervalos: 6a9, 8e9, 6-9 etc
+  const rangeMatch = numero.match(/(\d+)[aAeE\-](\d+)/);
+  if (rangeMatch) {
+    const start = Number(rangeMatch[1]);
+    const end = Number(rangeMatch[2]);
+    if (!isNaN(start) && !isNaN(end) && start <= end) {
+      const arr = [];
+      for (let n = start; n <= end; n++) arr.push(String(n));
+      return arr;
+    }
+  }
 
-const mockExpectativas = [{
-  id: '1',
-  keyword: 'Present Simple',
-  description: 'Compreender e utilizar o tempo verbal Present Simple para descrever rotinas, hábitos e fatos gerais.',
-  grade: '6'
-}, {
-  id: '2',
-  keyword: 'Vocabulary - Family',
-  description: 'Identificar e usar vocabulário relacionado a membros da família e relações familiares.',
-  grade: '6'
-}, {
-  id: '3',
-  keyword: 'Past Simple',
-  description: 'Aplicar o tempo verbal Past Simple para narrar eventos passados e contar histórias.',
-  grade: '7'
-}, {
-  id: '4',
-  keyword: 'Reading Comprehension',
-  description: 'Desenvolver estratégias de leitura para compreender textos informativos e narrativos.',
-  grade: '7'
-}, {
-  id: '5',
-  keyword: 'Modal Verbs',
-  description: 'Utilizar verbos modais (can, could, should, must) para expressar habilidade, possibilidade e obrigação.',
-  grade: '8'
-}, {
-  id: '6',
-  keyword: 'Conditional Sentences',
-  description: 'Construir e compreender sentenças condicionais (first e second conditional) em diferentes contextos.',
-  grade: '8'
-}, {
-  id: '7',
-  keyword: 'Passive Voice',
-  description: 'Reconhecer e aplicar a voz passiva em textos formais e acadêmicos.',
-  grade: '9'
-}, {
-  id: '8',
-  keyword: 'Academic Writing',
-  description: 'Produzir textos argumentativos e dissertativos seguindo estruturas acadêmicas.',
-  grade: '9'
-}];
+  // tenta detectar um único número: EF09, EF9 etc
+  const singleMatch = numero.match(/EF0?(\d+)/i);
+  if (singleMatch) return [String(Number(singleMatch[1]))];
+
+  return [];
+};
+
+const allSources = [
+  { arr: habilidades6a9, name: '6a9' },
+  { arr: habilidades8e9, name: '8e9' },
+  { arr: habilidades9, name: '9' },
+];
+
+let nextId = 1;
+const mockExpectativas = allSources.flatMap((source) => {
+  return source.arr.flatMap((h) => {
+    const grades = parseGradesFromNumero(h.numeroHabilidade);
+    // se não consegui inferir, tenta inferir com base no nome da fonte
+    const finalGrades = grades.length ? grades : (source.name === '6a9' ? ['6','7','8','9'] : source.name === '8e9' ? ['8','9'] : ['9']);
+
+    return finalGrades.map((g) => ({
+      id: nextId++,
+      keyword: h.palavraChave || h.numeroHabilidade,
+      description: h.descricao,
+      grade: String(g),
+    }));
+  });
+});
 
 const externalLinks = [{
   grade: '6º ano',
@@ -108,9 +112,7 @@ export function Expectativas() {
           <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="Buscar por palavra-chave..." />
 
           <div className="flex flex-wrap gap-2">
-            <button onClick={() => setSelectedGrade(null)} className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedGrade === null ? 'bg-[#1E88E5] text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}>
-              Todas
-            </button>
+          
             {grades.map(grade => <button key={grade} onClick={() => setSelectedGrade(grade)} className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedGrade === grade ? 'bg-[#1E88E5] text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}>
                 {grade}º ano
               </button>)}
