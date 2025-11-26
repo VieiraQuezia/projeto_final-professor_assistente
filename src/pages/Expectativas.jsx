@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { SearchBar } from '../components/SearchBar';
-import { ExpectativaCard } from '../components/ExpectativaCard';
-import { ExternalLink } from 'lucide-react';
+import React, { useState } from "react";
+import { SearchBar } from "../components/SearchBar";
+import { ExpectativaCard } from "../components/ExpectativaCard";
+import { ExternalLink } from "lucide-react";
 // ...existing code...
 
 const mockExpectativas = [{
@@ -84,7 +84,7 @@ const externalLinks = [{
   }]
 }];
 
-export function Expectativas() {
+export default function Expectativas() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGrade, setSelectedGrade] = useState(null);
 

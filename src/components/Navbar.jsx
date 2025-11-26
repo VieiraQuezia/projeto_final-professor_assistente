@@ -1,9 +1,9 @@
 // ...existing code...
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, Menu, X } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { BookOpen, Menu, X } from "lucide-react";
 
-export function Navbar() {
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const links = [

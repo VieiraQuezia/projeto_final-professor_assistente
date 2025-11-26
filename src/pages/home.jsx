@@ -1,9 +1,9 @@
 // ...existing code...
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { BookOpen, Dumbbell, Sparkles } from 'lucide-react';
+import React from "react";
+import { Link } from "react-router-dom";
+import { BookOpen, Dumbbell, Sparkles } from "lucide-react";
 
-export function Home() {
+export default function Home() {
   const features = [
     {
       icon: BookOpen,

@@ -1,8 +1,8 @@
 // ...existing code...
-import React from 'react';
-import { ExternalLink, Trash2 } from 'lucide-react';
+import React from "react";
+import { ExternalLink, Trash2 } from "lucide-react";
 
-export function ExerciseCard({ title, url, addedDate, onDelete }) {
+export default function ExerciseCard({ title, url, addedDate, onDelete }) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
       <div className="flex items-start justify-between gap-4 mb-3">

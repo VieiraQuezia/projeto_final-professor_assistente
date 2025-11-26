@@ -1,8 +1,8 @@
 // ...existing code...
-import React from 'react';
-import { BookOpen } from 'lucide-react';
+import React from "react";
+import { BookOpen } from "lucide-react";
 
-export function ExpectativaCard({ keyword, description, grade }) {
+export default function ExpectativaCard({ keyword, description, grade }) {
   const gradeColors = {
     '6': 'bg-green-100 text-green-800',
     '7': 'bg-blue-100 text-blue-800',
