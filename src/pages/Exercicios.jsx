@@ -1,6 +1,6 @@
 // ...existing code...
 import React, { useState } from "react";
-import { ExerciseCard } from "../components/ExerciseCard";
+import  ExerciseCard  from "../components/ExerciseCard";
 import { Plus } from "lucide-react";
 
 export default function Exercicios() {

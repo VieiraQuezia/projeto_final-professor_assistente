@@ -1,14 +1,17 @@
+// App.jsx (versão final)
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Navbar } from './components/Navbar';
-import { Footer } from './components/Footer';
-import { Home } from './pages/Home';
-import { Expectativas } from './pages/Expectativas';
-import { Exercicios } from './pages/Exercicios';
-import { AssistenteIA } from './pages/AssistenteIA';
-import { Sobre } from './pages/Sobre';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import Expectativas from './pages/Expectativas';
+import Exercicios from './pages/Exercicios';
+import AssistenteIA from './pages/AssistenteIA'; // você ainda pode manter a página se quiser
+import Sobre from './pages/Sobre';
+
 export default function App() {
-  return <BrowserRouter>
+  return (
+    <BrowserRouter>
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-1 pt-16">
@@ -21,6 +24,8 @@ export default function App() {
           </Routes>
         </main>
         <Footer />
+
       </div>
-    </BrowserRouter>;
+    </BrowserRouter>
+  );
 }

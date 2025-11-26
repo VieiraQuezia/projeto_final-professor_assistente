@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { SearchBar } from '../components/SearchBar';
-import { ExpectativaCard } from '../components/ExpectativaCard';
+import  SearchBar  from '../components/SearchBar';
+import ExpectativaCard from '../components/ExpectativaCard';
 import { ExternalLink } from 'lucide-react';
 import {
   habilidades6a9,
