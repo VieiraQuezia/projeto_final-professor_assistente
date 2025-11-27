@@ -6,14 +6,49 @@ import { Plus } from "lucide-react";
 export default function Exercicios() {
   const [exercises, setExercises] = useState([{
     id: '1',
-    title: 'Present Simple Quiz',
-    url: 'https://wordwall.net/resource/123456',
-    addedDate: '15/01/2024'
+    title: 'Present Simple - Quiz',
+    url: 'https://wordwall.net/pt/resource/34128739/english/aef1-u3a-present-simple',
+    addedDate: '27/11/2025'
   }, {
     id: '2',
-    title: 'Vocabulary Match - Family',
-    url: 'https://wordwall.net/resource/234567',
-    addedDate: '10/01/2024'
+    title: 'Vocabulary Match - Quiz',
+    url: 'https://wordwall.net/pt/resource/96610351/vocabulary-match',
+    addedDate: '27/11/2025'
+  }, {
+    id: '3',
+    title: 'Adjetives - Quiz',
+    url: 'https://wordwall.net/pt/resource/58079332/verb-to-be/ingl%C3%AAs-verbo-to-be-adjetives',
+    addedDate: '27/11/2025'
+  }, {
+    id: '4',
+    title: 'Verb To Be - Quiz',
+    url: 'https://wordwall.net/pt/resource/6786534/verb-to-be-quiz',
+    addedDate: '27/11/2025'
+  }, {
+    id: '5',
+    title: 'Present Perfect - Quiz',
+    url: 'https://wordwall.net/pt/resource/2929810/present-perfect',
+    addedDate: '27/11/2025'
+  }, {
+    id: '6',
+    title: 'Past Simple Verbs - Quiz',
+    url: 'https://wordwall.net/pt/resource/17530760/efl/past-simple-verbs',
+    addedDate: '27/11/2025'
+  }, {
+    id: '7',
+    title: 'Present Perfect Continuous - Quiz',
+    url: 'https://wordwall.net/pt/resource/57831388/unscramble-present-continuous-by-ap',
+    addedDate: '27/11/2025'
+  }, {
+    id: '8',
+    title: 'Past or Present Perfect - Quiz',
+    url: 'https://wordwall.net/pt/resource/20814909/past-or-present-perfect',
+    addedDate: '27/11/2025'
+  }, {
+    id: '9',
+    title: 'Future Tense - Quiz',
+    url: 'https://wordwall.net/pt/resource/5951512/future-tenses',
+    addedDate: '27/11/2025'
   }]);
 
   const [newTitle, setNewTitle] = useState('');
