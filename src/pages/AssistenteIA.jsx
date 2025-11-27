@@ -37,6 +37,7 @@ export default function AssistenteIA() {
     };
 
     const expectativasSala = mapaExpectativas[selectedSala];
+    const API_KEY = import.meta.env.VITE_GEMINI_KEY;
 
     const prompt = `
 Você é um assistente especializado em planejamento de aulas de Inglês para o Ensino Fundamental II.
@@ -60,7 +61,7 @@ GERAR:
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -69,13 +70,14 @@ GERAR:
           }),
         }
       );
+      
 
       const data = await response.json();
 
       const fullText =
         data?.candidates?.[0]?.content?.parts?.[0]?.text ||
         "Erro ao gerar conteúdo.";
-
+       
       const newCard = {
         id: Date.now(),
         tema: input,
