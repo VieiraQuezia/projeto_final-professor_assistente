@@ -107,7 +107,7 @@ export default function Sobre() {
           <div className="flex flex-wrap gap-2">
             {[
               'React',
-              'TypeScript',
+              'JavaScript',
               'Tailwind CSS',
               'React Router',
               'Lucide Icons',

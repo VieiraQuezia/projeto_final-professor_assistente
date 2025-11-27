@@ -22,7 +22,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-6 pt-6 border-t border-blue-700 text-center text-sm text-blue-200">
-          <p>© 2024 Professor Assistente - Desenvolvido com React e IA</p>
+          <p>© 2025 Professor Assistente - Desenvolvido com React e IA</p>
         </div>
       </div>
     </footer>;
