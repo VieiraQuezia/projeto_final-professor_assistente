@@ -1,6 +1,7 @@
 // ...existing code...
 import React from "react";
 import { BookOpen, Users, Target, Github } from "lucide-react";
+import '../App.css'
 
 export default function Sobre() {
   const scrumPhases = [
@@ -121,10 +122,11 @@ export default function Sobre() {
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <img src="/grupo6_logo.png" alt="Grupo 6 Logo" className="w-8 h-8" />
-            <h2 className="text-2xl font-semibold text-gray-900">Sobre o Grupo 6</h2>
-          </div>
+          <img src="/grupo6_logo.png" alt="Grupo 6 Logo" className="w-8 h-8" />
+          <h2 className="titulo">Sobre o Grupo 6</h2> 
+          
+            <img src="/grupolindo.png" alt="grupo" className="grupo" /> 
+          
           <p className="text-gray-700 mb-4">
             O Grupo 6 do SENAI é formado por pessoas unidas por um propósito comum: aprender, crescer e entregar sempre o melhor. Somos um time dedicado, versátil e comprometido com cada desafio que enfrentamos. A união é a base do nosso trabalho — apoiamos uns aos outros, compartilhamos conhecimento e celebramos cada conquista juntos.
           </p>
@@ -132,7 +134,14 @@ export default function Sobre() {
             Nossa alegria está presente no dia a dia, tornando o ambiente mais leve e motivador. Trabalhamos com respeito, valorizando as diferenças e reconhecendo a importância de cada integrante para o sucesso coletivo. Essa combinação de união, dedicação e respeito faz do Grupo 6 um exemplo de trabalho em equipe e evolução constante.
           </p>
           <p className="text-gray-700">
-            Mais do que colegas, somos um time forte, preparado e disposto a ir além.
+            Mais do que colegas, somos um time forte, preparado e disposto a ir além. 
+          </p>
+          <br />
+          <p className="text-gray-700">
+            Guilherme Gabriel - Desenvolvedor <br />
+            Hayeska Machado - Desenvolvedora <br />
+            Leonardo Mori - Desenvolvedor <br />
+            Quezia Amaral Vieira - Líder
           </p>
         </div>
 
