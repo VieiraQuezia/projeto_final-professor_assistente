@@ -1,7 +1,7 @@
 // src/pages/Exercicios.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ExerciseCard from "../components/ExerciseCard";
-import ExerciseModal from "../components/exerciseMdal"; // nome do seu modal
+import ExerciseModal from "../components/exerciseMdal"; 
 import { generateExercisesGemini } from "../components/generateExercise";
 import { Loader2 } from "lucide-react";
 
@@ -77,13 +77,16 @@ export default function Exercicios() {
   ]);
 
   const [tema, setTema] = useState("");
-  const [quantidade, setQuantidade] = useState("5");
-  const [turma, setTurma] = useState("6º Ano");
+  const [quantidade, setQuantidade] = useState("seleciona Quantidade");
+  const [turma, setTurma] = useState("Selecione uma turma");
   const [loading, setLoading] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
 
+  useEffect(() => {
+    localStorage.setItem(`Exercícios do ${turma}`, JSON.stringify(exercises));
+  }, [exercises]);
   // Gera exercícios via Gemini e insere 1 card IA (com todo o texto)
   const handleGerar = async () => {
     if (!tema.trim()) return;
@@ -115,31 +118,32 @@ export default function Exercicios() {
     }
   };
 
-  // Função que gera PDF de 1 card (passada para ExerciseCard)
-  const handleDownloadSinglePDF = (exercise) => {
-    // import dynamic to avoid SSR issues? Here we assume client-side.
-    const jsPDF = require("jspdf").jsPDF ?? require("jspdf");
-    const doc = new jsPDF();
-    let y = 12;
+// Função que gera PDF de 1 card (passada para ExerciseCard)
+const handleDownloadSinglePDF = async (exercise) => {
+  const { jsPDF } = await import("jspdf");
 
-    doc.setFontSize(18);
-    doc.text(exercise.title, 10, y);
-    y += 10;
+  const doc = new jsPDF();
+  let y = 12;
 
-    doc.setFontSize(12);
+  doc.setFontSize(18);
+  doc.text(exercise.title, 10, y);
+  y += 10;
 
-    const content = exercise.description || "";
-    const lines = doc.splitTextToSize(content, 180);
-    doc.text(lines, 10, y);
-    y += lines.length * 6;
+  doc.setFontSize(12);
 
-    doc.setFontSize(10);
-    doc.text(`Gerado em: ${exercise.addedDate}`, 10, y);
+  const content = exercise.description || "";
+  const lines = doc.splitTextToSize(content, 180);
+  doc.text(lines, 10, y);
+  y += lines.length * 6;
 
-    // nome seguro para arquivo
-    const safeName = exercise.title.replace(/[^a-z0-9_\-]/gi, "_").slice(0, 60);
-    doc.save(`${safeName}.pdf`);
-  };
+  doc.setFontSize(10);
+  doc.text(`Gerado em: ${exercise.addedDate}`, 10, y);
+
+  const safeName = exercise.title.replace(/[^a-z0-9_\-]/gi, "_").slice(0, 60);
+
+  doc.save(`${safeName}.pdf`);
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
