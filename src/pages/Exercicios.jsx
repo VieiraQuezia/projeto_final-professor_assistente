@@ -1,7 +1,7 @@
 // src/pages/Exercicios.jsx
 import React, { useState } from "react";
 import ExerciseCard from "../components/ExerciseCard";
-import ExerciseModal from "../components/exerciseMdal"; // nome do seu modal
+import ExerciseModal from "../components/exerciseMdal"; 
 import { generateExercisesGemini } from "../components/generateExercise";
 import { Loader2 } from "lucide-react";
 

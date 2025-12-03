@@ -43,7 +43,7 @@ const mockExpectativas = allSources.flatMap((source) => {
 
     return finalGrades.map((g) => ({
       id: nextId++,
-      keyword: h.palavraChave || h.numeroHabilidade,
+      keyword: h.palavraChave && h.numeroHabilidade,
       description: h.descricao,
       grade: String(g),
     }));

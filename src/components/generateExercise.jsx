@@ -11,7 +11,6 @@ export async function generateExercisesGemini({ tema, quantidade = 5, turma }) {
     }
   
     // 🔥 Teste opcional — mostra no console se está vindo certinho
-    console.log("🔑 Gemini API Key carregada:", API_KEY);
   
     const prompt = `
   Gere ${quantidade} exercícios didáticos de inglês para alunos da turma ${turma}.
