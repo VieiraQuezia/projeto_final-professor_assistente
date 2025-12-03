@@ -17,6 +17,7 @@ export async function generateExercisesGemini({ tema, quantidade = 5, turma }) {
   Tema: ${tema}
   
   Formato OBRIGATÓRIO (retorne SOMENTE isso, sem explicações adicionais, sem markdown):
+  De acordo com a turma selecionada deixe mais difícil os exercícios 
   
   EXERCICIOS:
   1) Título: <título curto>
