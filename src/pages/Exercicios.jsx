@@ -67,8 +67,8 @@ export default function Exercicios() {
 
   // Estados do formulário de geração de exercícios (entrada do usuário).
   const [tema, setTema] = useState("");
-  const [quantidade, setQuantidade] = useState("seleciona Quantidade"); // Quantidade de exercícios a gerar.
-  const [turma, setTurma] = useState("Selecione uma turma"); // Turma para a qual os exercícios são destinados.
+  const [quantidade, setQuantidade] = useState(""); // Quantidade de exercícios a gerar.
+  const [turma, setTurma] = useState(""); // Turma para a qual os exercícios são destinados.
   const [loading, setLoading] = useState(false); // Estado de carregamento da requisição Gemini.
 
   // Estados para o Modal de Visualização.
@@ -185,6 +185,7 @@ export default function Exercicios() {
                 onChange={(e) => setQuantidade(e.target.value)}
                 className="w-full border px-3 py-2 rounded-md"
               >
+                <option >selecione uma quantidade</option>
                 <option value="5">5</option>
                 <option value="10">10</option>
               </select>
@@ -198,6 +199,7 @@ export default function Exercicios() {
                 onChange={(e) => setTurma(e.target.value)}
                 className="w-full border px-3 py-2 rounded-md"
               >
+                <option>selecione uma turma</option>
                 <option>6º Ano</option>
                 <option>7º Ano</option>
                 <option>8º Ano</option>
