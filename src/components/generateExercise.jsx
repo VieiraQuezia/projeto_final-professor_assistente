@@ -4,7 +4,7 @@ export async function generateExercisesGemini({ tema, quantidade = 5, turma }) {
     // 🔥 Pegamos a KEY do jeito correto
     const API_KEY = import.meta.env.VITE_GEMINI_KEY;
   
-    // 🔥 Validação: evita erro 400 por key undefined
+    // Validação: evita erro 400 por key undefined
     if (!API_KEY) {
       console.error("❌ ERROR: VITE_GEMINI_KEY não encontrada. Verifique o arquivo .env!");
       throw new Error("Chave da API Gemini ausente.");
@@ -18,7 +18,7 @@ export async function generateExercisesGemini({ tema, quantidade = 5, turma }) {
   
   Formato OBRIGATÓRIO (retorne SOMENTE isso, sem explicações adicionais, sem markdown):
   De acordo com a turma selecionada deixe mais difícil os exercícios 
-  
+
   EXERCICIOS:
   1) Título: <título curto>
      Enunciado: <texto do enunciado, pode ter várias sentenças>
