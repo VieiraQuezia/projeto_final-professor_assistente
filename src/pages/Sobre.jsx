@@ -140,10 +140,10 @@ export default function Sobre() {
           <br />
           {/* Membros do Grupo */}
           <p className="text-gray-700">
-            Guilherme Gabriel - Desenvolvedor <br />
-            Hayeska Machado - Desenvolvedora <br />
-            Leonardo Mori - Desenvolvedor <br />
-            Quezia Amaral Vieira - Líder
+            Guilherme Gabriel Santana - Desenvolvedor 💻<br />
+            Hayeska Loredane Alves Machado - Desenvolvedora 💻<br />
+            Leonardo Mori Vicente - Vice-Líder 🧠<br />
+            Quezia Amaral Vieira - Líder 👑
           </p>
         </div>
 
