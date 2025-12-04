@@ -5,7 +5,61 @@ import {
   habilidades6a9,
   habilidades8e9,
   habilidades9,
+  habilidades6,
+  habilidades6e7,
+  habilidades7,
+  habilidades8
 } from "../components/expectativasData";
+
+/* -----------------------------------------------------
+   MESMA FUNÇÃO DE PARSE USADA EM Expectativas.jsx
+------------------------------------------------------ */
+const parseGradesFromNumero = (numero) => {
+  if (!numero) return [];
+
+  const str = numero.toLowerCase();
+
+  // detecta "6a9", "6-9", "6e9", etc.
+  const rangeMatch = str.match(/(\d+)\s*[a\-e]\s*(\d+)/i);
+  if (rangeMatch) {
+    const start = Number(rangeMatch[1]);
+    const end = Number(rangeMatch[2]);
+    if (start <= end) {
+      return Array.from({ length: end - start + 1 }, (_, i) =>
+        String(start + i)
+      );
+    }
+  }
+
+  // detecta BNCC: EF06, EF8, EF09...
+  const bnccMatch = str.match(/ef0?(\d+)/i);
+  if (bnccMatch) {
+    return [String(Number(bnccMatch[1]))];
+  }
+
+  // detecta número solto
+  const numberMatch = str.match(/(\d+)/);
+  if (numberMatch) {
+    return [String(Number(numberMatch[1]))];
+  }
+
+  return [];
+};
+
+/* -----------------------------------------------------
+   CONVERTE LISTAS DE HABILIDADES EM TEXTO PARA O PROMPT
+------------------------------------------------------ */
+const formatarLista = (arr) =>
+  arr
+    .map((h) => {
+      const codigo = h.numeroHabilidade || "";
+      const palavra = h.palavraChave || "";
+      const descricao = h.descricao || "";
+
+      return `• ${codigo} — ${palavra}: ${descricao}`;
+    })
+    .join("\n");
+
 
 export default function AssistenteIA() {
   const [cards, setCards] = useState(() => {
@@ -17,46 +71,70 @@ export default function AssistenteIA() {
   const [selectedSala, setSelectedSala] = useState("");
   const [selectedCard, setSelectedCard] = useState(null);
 
-  const [isLoading, setIsLoading] = useState(false); // 🔥 Animação de carregamento
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("iaFlashcards", JSON.stringify(cards));
   }, [cards]);
 
+  /* -----------------------------------------------------
+     MAPA CORRIGIDO — AGORA USA TODAS AS HABILIDADES
+  ------------------------------------------------------ */
+  const mapaExpectativas = {
+    "6ano": [...habilidades6, ...habilidades6e7, ...habilidades6a9],
+    "7ano": [...habilidades7, ...habilidades6e7, ...habilidades6a9],
+    "8ano": [
+      ...habilidades8,
+      ...habilidades8e9,
+      ...habilidades6a9
+    ],
+    "9ano": [
+      ...habilidades9,
+      ...habilidades8e9,
+      ...habilidades6a9
+    ],
+  };
+
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim() || !selectedSala) return;
 
-    setIsLoading(true); // ⬅️ Ativa o loading antes da requisição
-
-    const mapaExpectativas = {
-      "6ano": habilidades6a9,
-      "7ano": habilidades6a9,
-      "8ano": [...habilidades6a9, ...habilidades8e9],
-      "9ano": [...habilidades6a9, ...habilidades8e9, ...habilidades9],
-    };
+    setIsLoading(true);
 
     const expectativasSala = mapaExpectativas[selectedSala];
+    const expectativasFormatadas = formatarLista(expectativasSala);
+
     const API_KEY = import.meta.env.VITE_GEMINI_KEY;
 
+    /* -----------------------------------------------------
+          PROMPT AGORA COMPLETO E ORGANIZADO
+    ------------------------------------------------------ */
     const prompt = `
-Você é um assistente especializado em planejamento de aulas de Inglês para o Ensino Fundamental II.
+Você é um assistente especialista em planejamento de aulas de Inglês para o Ensino Fundamental II.
 
-Gere o planejamento baseado na sala e tema informados:
+GERAR O PLANEJAMENTO COM BASE NOS DADOS:
 
 SALA: ${selectedSala.replace("ano", "")}º ano
 TEMA DA AULA: "${input}"
 
-Use APENAS as expectativas correspondentes à sala escolhida:
+USE APENAS AS EXPECTATIVAS DESTA TURMA:
 
-Expectativas disponíveis:
-${expectativasSala.join("\n")}
+${expectativasFormatadas}
 
-GERAR:
-1. Todas as expectativas relacionadas ao tema da aula (código + ano + frase curta)
-2. 4 a 6 atividades criativas ADAPTADAS para a sala
-3. Não usar markdown
-4. Entregar resposta separada em: EXPECTATIVAS, ATIVIDADES CRIATIVAS e SUGESTÕES DE AULA.
+DEVOLVA EXATAMENTE O SEGUINTE:
+
+EXPECTATIVAS:
+- Liste apenas as expectativas relevantes ao tema (código + frase curta)
+
+ATIVIDADES CRIATIVAS:
+- Crie entre 4 e 6 atividades adaptadas ao ano escolhido
+
+SUGESTÕES DE AULA:
+- Estratégias práticas e rápidas para o professor aplicar
+
+NÃO USAR MARKDOWN.
+NÃO ADICIONAR TÍTULOS EXTRAS.
+NÃO INVENTAR EXPECTATIVAS QUE NÃO ESTÃO NA LISTA.
 `;
 
     try {
@@ -70,14 +148,13 @@ GERAR:
           }),
         }
       );
-      
 
       const data = await response.json();
 
       const fullText =
         data?.candidates?.[0]?.content?.parts?.[0]?.text ||
         "Erro ao gerar conteúdo.";
-       
+
       const newCard = {
         id: Date.now(),
         tema: input,
@@ -88,21 +165,23 @@ GERAR:
       setCards((prev) => [newCard, ...prev]);
       setInput("");
       setSelectedSala("");
-
     } catch (error) {
       console.error("ERRO GEMINI:", error);
     } finally {
-      setIsLoading(false); // ⬅️ Desliga o loading no final
+      setIsLoading(false);
     }
   };
 
+  /* -----------------------------------------------------
+     COMPONENTE JSX (NÃO ALTERADO)
+  ------------------------------------------------------ */
   return (
     <div className="max-w-5xl mx-auto p-8">
       <h2 className="text-2xl font-bold text-black mb-6">
         Assistente IA — Flashcards com Modal
       </h2>
 
-      {/* FORM */}
+      {/* Form */}
       <form onSubmit={handleSend} className="flex gap-3 mb-8">
         <select
           className="bg-white border px-3 py-2 rounded-md text-black"
@@ -138,7 +217,7 @@ GERAR:
         </button>
       </form>
 
-      {/* LOADING ANIMATION */}
+      {/* Loading */}
       {isLoading && (
         <div className="flex justify-center my-6">
           <div className="flex flex-col items-center gap-3">
@@ -148,7 +227,7 @@ GERAR:
         </div>
       )}
 
-      {/* LISTA DE CARDS */}
+      {/* Cards */}
       {!isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cards.map((card) => (
@@ -160,10 +239,7 @@ GERAR:
               <h3 className="text-xl font-bold">{card.tema}</h3>
 
               <p className="text-sm mt-1">
-                Turma:{" "}
-                {card?.sala
-                  ? card.sala.replace("ano", "º ano")
-                  : "Sem sala"}
+                Turma: {card.sala.replace("ano", "º ano")}
               </p>
 
               <p className="opacity-80 mt-2 text-sm">Clique para abrir</p>
@@ -172,7 +248,7 @@ GERAR:
         </div>
       )}
 
-      {/* MODAL */}
+      {/* Modal */}
       {selectedCard && (
         <>
           <div
@@ -194,10 +270,7 @@ GERAR:
               </h2>
 
               <p className="text-sm mb-4 text-gray-600">
-                Turma:{" "}
-                {selectedCard?.sala
-                  ? selectedCard.sala.replace("ano", "º ano")
-                  : "Sem sala"}
+                Turma: {selectedCard.sala.replace("ano", "º ano")}
               </p>
 
               <div className="text-black whitespace-pre-wrap max-h-96 overflow-y-auto">

@@ -11,7 +11,7 @@ export default function ExerciseCard({
   isAI,
   onClick,
   onDelete,
-  onDownload, // ← função recebida para baixar PDF
+  onDownload,
 }) {
   return (
     <div
