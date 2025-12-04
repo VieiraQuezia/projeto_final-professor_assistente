@@ -4,15 +4,15 @@ import { Download } from "lucide-react";
 
 // Componente que representa um cartão de exercício
 export default function ExerciseCard({
-  id,            // id do exercício (não está sendo usado diretamente, mas pode ser útil)
-  title,         // título do exercício
-  url,           // link para abrir o exercício (para exercícios normais)
-  description,   // descrição do exercício (apenas para cards IA)
-  addedDate,     // data em que o exercício foi adicionado
-  isAI,          // booleano → se o exercício foi gerado por IA
-  onClick,       // função executada quando o card é clicado
-  onDelete,      // função para deletar (não está sendo usada neste trecho, mas já preparada)
-  onDownload,    // função executada para baixar o PDF (nos cards IA)
+  id,
+  title,
+  url,
+  description,
+  addedDate,
+  isAI,
+  onClick,
+  onDelete,
+  onDownload, // ← função recebida para baixar PDF
 }) {
   return (
     <div
