@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { SendIcon, X } from "lucide-react";
 
-// Importa listas de expectativas para cada série
+// Importa listas de expectativas de cada série
+// Cada arquivo contém objetos com { numeroHabilidade, palavraChave, descricao }
 import {
   habilidades6a9,
   habilidades8e9,
@@ -13,14 +14,14 @@ import {
 } from "../components/expectativasData";
 
 /* -----------------------------------------------------
-   MESMA FUNÇÃO DE PARSE USADA EM Expectativas.jsx
+   FUNÇÃO PARA IDENTIFICAR O ANO ESCOLAR A PARTIR DO CÓDIGO
 ------------------------------------------------------ */
 const parseGradesFromNumero = (numero) => {
   if (!numero) return [];
 
   const str = numero.toLowerCase();
 
-  // detecta "6a9", "6-9", "6e9", etc.
+  // Verifica padrões como: "6a9", "6-9", "6 e 9"
   const rangeMatch = str.match(/(\d+)\s*[a\-e]\s*(\d+)/i);
   if (rangeMatch) {
     const start = Number(rangeMatch[1]);
@@ -32,13 +33,13 @@ const parseGradesFromNumero = (numero) => {
     }
   }
 
-  // detecta BNCC: EF06, EF8, EF09...
+  // Detecta códigos BNCC como EF06, EF8, EF09
   const bnccMatch = str.match(/ef0?(\d+)/i);
   if (bnccMatch) {
     return [String(Number(bnccMatch[1]))];
   }
 
-  // detecta número solto
+  // Detecta números soltos e usa
   const numberMatch = str.match(/(\d+)/);
   if (numberMatch) {
     return [String(Number(numberMatch[1]))];
@@ -48,7 +49,7 @@ const parseGradesFromNumero = (numero) => {
 };
 
 /* -----------------------------------------------------
-   CONVERTE LISTAS DE HABILIDADES EM TEXTO PARA O PROMPT
+   TRANSFORMA LISTA DE HABILIDADES EM TEXTO PARA O PROMPT
 ------------------------------------------------------ */
 const formatarLista = (arr) =>
   arr
@@ -64,31 +65,40 @@ const formatarLista = (arr) =>
 
 export default function AssistenteIA() {
 
-  // 🔹 Lista de cards gravados (carregando do localStorage)
+  /* -----------------------------------------------------
+     ESTADOS PRINCIPAIS
+  ------------------------------------------------------ */
+
+  // Lista de cards salvos (recupera do localStorage ao carregar)
   const [cards, setCards] = useState(() => {
     const saved = localStorage.getItem("iaFlashcards");
-    return saved ? JSON.parse(saved) : []; // Se existir, usa; senão, inicia vazio
+    return saved ? JSON.parse(saved) : [];
   });
 
-  // 🔹 Input do usuário
+  // Input do tema digitado pelo usuário
   const [input, setInput] = useState("");
 
-  // 🔹 Sala selecionada (6º, 7º, 8º ou 9º)
+  // Sala selecionada (6º, 7º, 8º, 9º)
   const [selectedSala, setSelectedSala] = useState("");
 
-  // 🔹 Card atualmente aberto no modal
+  // Card aberto no modal
   const [selectedCard, setSelectedCard] = useState(null);
 
+  // Loading para mostrar spinner de carregamento
   const [isLoading, setIsLoading] = useState(false);
 
 
-  // 🧠 Sempre que os cards mudam, salva no localStorage
+  /* -----------------------------------------------------
+     SEMPRE QUE A LISTA DE CARDS MUDA → SALVA NO LOCALSTORAGE
+  ------------------------------------------------------ */
   useEffect(() => {
     localStorage.setItem("iaFlashcards", JSON.stringify(cards));
   }, [cards]);
 
+
   /* -----------------------------------------------------
-     MAPA CORRIGIDO — AGORA USA TODAS AS HABILIDADES
+     MAPA DE EXPECTATIVAS POR SALA
+     Junta corretamente as listas correspondentes a cada ano
   ------------------------------------------------------ */
   const mapaExpectativas = {
     "6ano": [...habilidades6, ...habilidades6e7, ...habilidades6a9],
@@ -105,22 +115,27 @@ export default function AssistenteIA() {
     ],
   };
 
+  /* -----------------------------------------------------
+     FUNÇÃO PRINCIPAL — ENVIA O PEDIDO PARA A IA
+  ------------------------------------------------------ */
   const handleSend = async (e) => {
-    e.preventDefault(); // Evita recarregar a página
+    e.preventDefault(); // Impede refresh
 
-    // Se não tiver tema ou sala, não envia
+    // Bloqueia envio se faltar tema ou sala
     if (!input.trim() || !selectedSala) return;
 
     setIsLoading(true);
 
-    // Lista correta de expectativas para a sala escolhida
+    // Pega as expectativas corretas da série selecionada
     const expectativasSala = mapaExpectativas[selectedSala];
+
+    // Converte expectativas para texto estruturado
     const expectativasFormatadas = formatarLista(expectativasSala);
 
     const API_KEY = import.meta.env.VITE_GEMINI_KEY;
 
     /* -----------------------------------------------------
-          PROMPT AGORA COMPLETO E ORGANIZADO
+          MONTA O PROMPT COMPLETO PARA A IA
     ------------------------------------------------------ */
     const prompt = `
 Você é um assistente especialista em planejamento de aulas de Inglês para o Ensino Fundamental II.
@@ -150,9 +165,8 @@ NÃO ADICIONAR TÍTULOS EXTRAS.
 NÃO INVENTAR EXPECTATIVAS QUE NÃO ESTÃO NA LISTA.
 `;
 
-
     try {
-      // 🌐 Requisição ao modelo Gemini
+      // Requisição para API Gemini
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
         {
@@ -163,25 +177,29 @@ NÃO INVENTAR EXPECTATIVAS QUE NÃO ESTÃO NA LISTA.
           }),
         }
       );
+
+      // Lê resposta da IA
       const data = await response.json();
 
-      // Coleta o texto retornado pela IA de forma segura
       const fullText =
         data?.candidates?.[0]?.content?.parts?.[0]?.text ||
         "Erro ao gerar conteúdo.";
+
+      // Monta card criado
       const newCard = {
-        id: Date.now(),   // ID único baseado no tempo
-        tema: input,      // Tema digitado
-        sala: selectedSala, // Sala selecionada
-        conteudo: fullText, // Texto gerado
+        id: Date.now(),        // ID único
+        tema: input,           // Tema da aula
+        sala: selectedSala,    // Ano
+        conteudo: fullText,    // Texto da IA
       };
 
-      // Atualiza lista de cards (card novo aparece primeiro)
+      // Insere card no topo da lista
       setCards((prev) => [newCard, ...prev]);
 
-      // Limpa os campos do formulário
+      // Limpa formulário
       setInput("");
       setSelectedSala("");
+
     } catch (error) {
       console.error("ERRO GEMINI:", error);
 
@@ -191,17 +209,17 @@ NÃO INVENTAR EXPECTATIVAS QUE NÃO ESTÃO NA LISTA.
   };
 
   /* -----------------------------------------------------
-     COMPONENTE JSX (NÃO ALTERADO)
+     INTERFACE JSX (RENDERIZAÇÃO)
   ------------------------------------------------------ */
   return (
     <div className="max-w-5xl mx-auto p-8">
 
-      {/* 🔹 Título */}
+      {/* Título */}
       <h2 className="text-2xl font-bold text-black mb-6">
         Assistente IA — Flashcards com Modal
       </h2>
 
-      {/* Form */}
+      {/* Formulário */}
       <form onSubmit={handleSend} className="flex gap-3 mb-8">
 
         {/* Seleção da sala */}
@@ -217,7 +235,7 @@ NÃO INVENTAR EXPECTATIVAS QUE NÃO ESTÃO NA LISTA.
           <option value="9ano">9º ano</option>
         </select>
 
-        {/* Input do tema */}
+        {/* Campo tema */}
         <input
           className="flex-1 bg-white border px-4 py-2 rounded-md text-black"
           placeholder="Digite o tema da aula..."
@@ -230,8 +248,8 @@ NÃO INVENTAR EXPECTATIVAS QUE NÃO ESTÃO NA LISTA.
           disabled={isLoading}
           className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700 disabled:bg-blue-400"
         >
-          {/* Se estiver carregando → mostra spinner */}
           {isLoading ? (
+            // Animação de carregamento
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
@@ -246,13 +264,13 @@ NÃO INVENTAR EXPECTATIVAS QUE NÃO ESTÃO NA LISTA.
       {isLoading && (
         <div className="flex justify-center my-6">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
             <p className="text-blue-700 font-medium">Gerando conteúdo...</p>
           </div>
         </div>
       )}
 
-      {/* Cards */}
+      {/* Lista de cards */}
       {!isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cards.map((card) => (
@@ -262,11 +280,9 @@ NÃO INVENTAR EXPECTATIVAS QUE NÃO ESTÃO NA LISTA.
               className="bg-blue-500 text-white p-6 rounded-xl shadow-lg cursor-pointer hover:bg-blue-600 transition"
             >
               <h3 className="text-xl font-bold">{card.tema}</h3>
-
               <p className="text-sm mt-1">
                 Turma: {card.sala.replace("ano", "º ano")}
               </p>
-
               <p className="opacity-80 mt-2 text-sm">Clique para abrir</p>
             </div>
           ))}
@@ -276,17 +292,17 @@ NÃO INVENTAR EXPECTATIVAS QUE NÃO ESTÃO NA LISTA.
       {/* Modal */}
       {selectedCard && (
         <>
-          {/* Fundo escuro atrás do modal */}
+          {/* Fundo escurecido */}
           <div
             onClick={() => setSelectedCard(null)}
             className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
           />
 
-          {/* Conteúdo do modal */}
+          {/* Janela modal */}
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
             <div className="bg-white max-w-lg w-full p-6 rounded-xl shadow-xl relative">
 
-              {/* Botão X para fechar */}
+              {/* Botão de fechar */}
               <button
                 className="absolute top-3 right-3 text-gray-700 hover:text-black"
                 onClick={() => setSelectedCard(null)}
@@ -299,12 +315,12 @@ NÃO INVENTAR EXPECTATIVAS QUE NÃO ESTÃO NA LISTA.
                 {selectedCard.tema}
               </h2>
 
-              {/* Sala */}
+              {/* Série */}
               <p className="text-sm mb-4 text-gray-600">
                 Turma: {selectedCard.sala.replace("ano", "º ano")}
               </p>
 
-              {/* Texto gerado pela IA */}
+              {/* Conteúdo */}
               <div className="text-black whitespace-pre-wrap max-h-96 overflow-y-auto">
                 {selectedCard.conteudo}
               </div>
