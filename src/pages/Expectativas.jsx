@@ -1,8 +1,14 @@
+// Importa o React e o hook useState
 import React, { useState } from 'react';
+
+// Componentes da aplicação
 import SearchBar from '../components/SearchBar';
 import ExpectativaCard from '../components/ExpectativaCard';
+
+// Ícone para os links externos
 import { ExternalLink } from 'lucide-react';
 
+// Importa TODOS os blocos de habilidades de diferentes séries
 import {
   habilidades6a9,
   habilidades9,
@@ -13,43 +19,48 @@ import {
   habilidades8
 } from '../components/expectativasData';
 
-/* -------------------------------
-   PARSE — Detecta TODAS as séries
--------------------------------- */
+/* -------------------------------------------------------------------
+   Função parseGradesFromNumero()
+   - Lê o número da habilidade (ex.: "6a9", "EF06", "8", etc.)
+   - Descobre para quais séries essa habilidade vale
+------------------------------------------------------------------------ */
 
 const parseGradesFromNumero = (numero) => {
-  if (!numero) return [];
+  if (!numero) return []; // Se não existe número, retorna vazio
 
-  const str = numero.toLowerCase();
+  const str = numero.toLowerCase(); // Normaliza para string minúscula
 
-  // Detecta padrões tipo "6a9", "6-9", "6e9"
+  // 1) Detecta padrões tipo "6a9", "6-9", "6e9"
   const rangeMatch = str.match(/(\d+)\s*[a\-e]\s*(\d+)/i);
   if (rangeMatch) {
     const start = Number(rangeMatch[1]);
     const end = Number(rangeMatch[2]);
+
+    // Gera todas as séries entre início e fim
     if (!isNaN(start) && !isNaN(end) && start <= end) {
       return Array.from({ length: end - start + 1 }, (_, i) => String(start + i));
     }
   }
 
-  // Detecta BNCC: EF06, EF8, EF09 etc.
+  // 2) Detecta códigos BNCC: EF06, EF8, EF09
   const bnccMatch = str.match(/ef0?(\d+)/i);
   if (bnccMatch) {
     return [String(Number(bnccMatch[1]))];
   }
 
-  // Detecta número solto
+  // 3) Detecta números soltos tipo "8"
   const numberMatch = str.match(/(\d+)/);
   if (numberMatch) {
     return [String(Number(numberMatch[1]))];
   }
 
-  return [];
+  return []; // Nenhum padrão reconhecido
 };
 
-/* -------------------------------
-   ARMAZENA TODAS AS FONTES
--------------------------------- */
+/* -------------------------------------------------------------------
+   Armazena todas as fontes de habilidades em um único array
+   - Cada bloco tem uma lista e um nome usado para fallback
+------------------------------------------------------------------------ */
 
 const allSources = [
   { arr: habilidades6a9, name: '6a9' },
@@ -61,17 +72,20 @@ const allSources = [
   { arr: habilidades6, name: '6' }
 ];
 
-/* -------------------------------
-   GERA TODAS AS EXPECTATIVAS
--------------------------------- */
+/* -------------------------------------------------------------------
+   Gera TODAS as expectativas unificadas
+   - Cada item terá: id, keyword, description, grade
+   - Se um item pertence a várias séries, ele gera vários cartões
+------------------------------------------------------------------------ */
 
-let nextId = 1;
+let nextId = 1; // ID incremental para cada expectativa
 
 const mockExpectativas = allSources.flatMap((source) =>
   source.arr.flatMap((h) => {
+    // Tenta obter séries a partir do número da habilidade
     const grades = parseGradesFromNumero(h.numeroHabilidade);
 
-    // Se não achou nada, usa fallback baseado no nome do array
+    // Se não encontrou nada, usa fallback baseado no nome do bloco
     const finalGrades =
       grades.length > 0
         ? grades
@@ -84,18 +98,19 @@ const mockExpectativas = allSources.flatMap((source) =>
         : source.name === '9' ? ['9']
         : [];
 
+    // Cria um item para CADA série encontrada
     return finalGrades.map((g) => ({
-      id: nextId++,
+      id: nextId++, // ID único
       keyword: `${h.palavraChave || ''} ${h.numeroHabilidade || ''}`.trim(),
       description: h.descricao,
-      grade: g,
+      grade: g, // Série (ex.: "6", "8")
     }));
   })
 );
 
-/* -------------------------------
-   LINKS EXTERNOS POR SÉRIE
--------------------------------- */
+/* -------------------------------------------------------------------
+   Lista de links externos organizados por série
+------------------------------------------------------------------------ */
 
 const externalLinks = [
   {
@@ -128,43 +143,56 @@ const externalLinks = [
   }
 ];
 
-/* -------------------------------
-   COMPONENTE PRINCIPAL
--------------------------------- */
+/* -------------------------------------------------------------------
+   COMPONENTE PRINCIPAL DA PÁGINA
+   - Mostra busca, filtros, cards e links externos
+------------------------------------------------------------------------ */
 
 export default function Expectativas() {
+  // Estado para texto de busca
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Estado para série selecionada
   const [selectedGrade, setSelectedGrade] = useState(null);
 
+  // Filtra expectativas de acordo com busca + série
   const filteredExpectativas = mockExpectativas.filter((exp) => {
     const lower = searchTerm.toLowerCase();
+
+    // Verifica se texto aparece na keyword ou descrição
     const matchesSearch =
       exp.keyword.toLowerCase().includes(lower) ||
       exp.description.toLowerCase().includes(lower);
 
+    // Verifica série (se selectedGrade = null, mostra todas)
     const matchesGrade = !selectedGrade || exp.grade === selectedGrade;
 
     return matchesSearch && matchesGrade;
   });
 
+  // Lista fixa de séries
   const grades = ['6', '7', '8', '9'];
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
+        {/* TÍTULO */}
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           Expectativas de Aprendizagem
         </h1>
 
-        {/* Search + Filtros */}
+        {/* BARRA DE BUSCA + FILTROS */}
         <div className="mb-8 space-y-4">
+          
+          {/* Campo de busca */}
           <SearchBar
             value={searchTerm}
             onChange={setSearchTerm}
             placeholder="Buscar por palavra-chave..."
           />
 
+          {/* Botões de série */}
           <div className="flex flex-wrap gap-2">
             {grades.map((grade) => (
               <button
@@ -182,7 +210,7 @@ export default function Expectativas() {
           </div>
         </div>
 
-        {/* Lista de resultados */}
+        {/* LISTA DE RESULTADOS */}
         {filteredExpectativas.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow-md">
             <p className="text-gray-500">Nenhuma expectativa encontrada</p>
@@ -195,7 +223,7 @@ export default function Expectativas() {
           </div>
         )}
 
-        {/* LINKS EXTERNOS */}
+        {/* SESSÃO DE LINKS EXTERNOS */}
         <div className="mt-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Links Externos por Turma
@@ -204,10 +232,13 @@ export default function Expectativas() {
           <div className="grid md:grid-cols-2 gap-6">
             {externalLinks.map((section) => (
               <div key={section.grade} className="bg-white rounded-lg shadow-md p-6">
+                
+                {/* Nome da série */}
                 <h3 className="text-xl font-semibold text-[#1E88E5] mb-4">
                   {section.grade}
                 </h3>
 
+                {/* Lista de links */}
                 <ul className="space-y-3">
                   {section.links.map((link, i) => (
                     <li key={i}>
@@ -223,6 +254,7 @@ export default function Expectativas() {
                     </li>
                   ))}
                 </ul>
+
               </div>
             ))}
           </div>
