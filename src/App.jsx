@@ -6,7 +6,7 @@ import Footer from './components/footer';
 import Home from './pages/home';
 import Expectativas from './pages/Expectativas';
 import Exercicios from './pages/Exercicios';
-import AssistenteIA from './pages/AssistenteIA'; // você ainda pode manter a página se quiser
+import AssistenteIA from './pages/AssistenteIA'; 
 import Sobre from './pages/Sobre';
 
 export default function App() {
