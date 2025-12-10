@@ -1,178 +1,82 @@
-import React, { useState, useEffect } from "react";
-import { SendIcon, X, Download } from "lucide-react";
+import React from "react";
+import { Trash2, ExternalLink, Download } from "lucide-react";
 
-// Importa listas de expectativas de cada série
-import {
-  habilidades6a9,
-  habilidades8e9,
-  habilidades9,
-  habilidades6,
-  habilidades6e7,
-  habilidades7,
-  habilidades8
-} from "../components/expectativasData";
-import { div } from "framer-motion/client";
-
-/* -----------------------------------------------------
-   FUNÇÃO PARA IDENTIFICAR O ANO ESCOLAR A PARTIR DO CÓDIGO
------------------------------------------------------- */
-const parseGradesFromNumero = (numero) => {
-  if (!numero) return [];
-
-  const str = numero.toLowerCase();
-  const rangeMatch = str.match(/(\d+)\s*[a\-e]\s*(\d+)/i);
-  if (rangeMatch) {
-    const start = Number(rangeMatch[1]);
-    const end = Number(rangeMatch[2]);
-    if (start <= end) {
-      return Array.from({ length: end - start + 1 }, (_, i) =>
-        String(start + i)
-      );
-    }
-  }
-
-  const bnccMatch = str.match(/ef0?(\d+)/i);
-  if (bnccMatch) {
-    return [String(Number(bnccMatch[1]))];
-  }
-
-  const numberMatch = str.match(/(\d+)/);
-  if (numberMatch) {
-    return [String(Number(numberMatch[1]))];
-  }
-
-  return [];
-};
-
-/* -----------------------------------------------------
-   TRANSFORMA LISTA DE HABILIDADES EM TEXTO PARA O PROMPT
------------------------------------------------------- */
-const formatarLista = (arr) =>
-  arr
-    .map((h) => {
-      const codigo = h.numeroHabilidade || "";
-      const palavra = h.palavraChave || "";
-      const descricao = h.descricao || "";
-
-      return `• ${codigo} — ${palavra}: ${descricao}`;
-    })
-    .join("\n");
-
-export default function AssistenteIA() {
-  /* -----------------------------------------------------
-     ESTADOS PRINCIPAIS
-  ------------------------------------------------------ */
-  const [cards, setCards] = useState(() => {
-    const saved = localStorage.getItem("iaFlashcards");
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [input, setInput] = useState("");
-  const [selectedSala, setSelectedSala] = useState("");
-  const [selectedCard, setSelectedCard] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  /* -----------------------------------------------------
-     SALVAR CARDS NO LOCAL STORAGE
-  ------------------------------------------------------ */
-  useEffect(() => {
-    localStorage.setItem("iaFlashcards", JSON.stringify(cards));
-  }, [cards]);
-
-  /* -----------------------------------------------------
-     MAPA DE EXPECTATIVAS POR SALA
-  ------------------------------------------------------ */
-  const mapaExpectativas = {
-    "6ano": [...habilidades6, ...habilidades6e7, ...habilidades6a9],
-    "7ano": [...habilidades7, ...habilidades6e7, ...habilidades6a9],
-    "8ano": [...habilidades8, ...habilidades8e9, ...habilidades6a9],
-    "9ano": [...habilidades9, ...habilidades8e9, ...habilidades6a9],
-  };
-
-  /* -----------------------------------------------------
-     FUNÇÃO PRINCIPAL — ENVIA PARA GEMINI
-  ------------------------------------------------------ */
-  const handleSend = async (e) => {
-    e.preventDefault();
-
-    if (!input.trim() || !selectedSala) return;
-
-    setIsLoading(true);
-
-    const expectativasSala = mapaExpectativas[selectedSala];
-    const expectativasFormatadas = formatarLista(expectativasSala);
-
-    const API_KEY = import.meta.env.VITE_GEMINI_KEY;
-
-    const prompt = `
-Você é um assistente especialista em planejamento de aulas de Inglês para o Ensino Fundamental II.
-
-GERAR O PLANEJAMENTO COM BASE NOS DADOS:
-
-SALA: ${selectedSala.replace("ano", "")}º ano
-TEMA DA AULA: "${input}"
-
-USE APENAS AS EXPECTATIVAS DESTA TURMA:
-
-${expectativasFormatadas}
-
-DEVOLVA EXATAMENTE O SEGUINTE:
-
-EXPECTATIVAS:
-- Liste apenas as expectativas relevantes ao tema (código + frase curta)
-
-ATIVIDADES CRIATIVAS:
-- Crie entre 4 e 6 atividades adaptadas ao ano escolhido
-
-SUGESTÕES DE AULA:
-- Estratégias práticas e rápidas para o professor aplicar
-
-NÃO USAR MARKDOWN.
-NÃO ADICIONAR TÍTULOS EXTRAS.
-NÃO INVENTAR EXPECTATIVAS QUE NÃO ESTÃO NA LISTA.
-`;
-
-    try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      const fullText =
-        data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-        "Erro ao gerar conteúdo.";
-
-      const newCard = {
-        id: Date.now(),
-        tema: input,
-        sala: selectedSala,
-        conteudo: fullText,
-      };
-
-      setCards((prev) => [newCard, ...prev]);
-      setInput("");
-      setSelectedSala("");
-
-    } catch (error) {
-      console.error("ERRO GEMINI:", error);
-
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /* -----------------------------------------------------
-     INTERFACE JSX
-  ------------------------------------------------------ */
+export default function ExerciseCard({
+  title,
+  url,
+  description,
+  summary,
+  addedDate,
+  isAI = false,
+  onClick,      
+  onDelete,
+  onDownload,
+}) {
   return (
-   <div></div>
+    <div
+      className="bg-white shadow-sm rounded-lg p-5 border border-gray-200 hover:shadow-md transition flex flex-col justify-between cursor-pointer"
+      onClick={onClick} 
+    >
+      {/* Título */}
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        {title}
+      </h3>
+
+      {/* Link */}
+      {url && (
+        <a
+          href={url}
+          target="_blank"
+          onClick={(e) => e.stopPropagation()} // ← impede abrir modal
+          className="text-blue-600 underline mb-3 flex items-center gap-2"
+        >
+          Abrir exercício
+          <ExternalLink size={16} />
+        </a>
+      )}
+
+      {/* Prévia SOMENTE para IA */}
+      {isAI && summary && (
+        <p className="text-sm text-gray-700 mb-3 whitespace-pre-line line-clamp-3">
+          {summary}
+        </p>
+      )}
+
+      {/* Data */}
+      <p className="text-sm text-gray-500 mb-4">
+        Adicionado em: <strong>{addedDate}</strong>
+      </p>
+
+      {/* Botões SOMENTE IA */}
+      {isAI && (
+        <div className="flex justify-center gap-4 pt-2">
+          {/* PDF */}
+          {description && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();  // ← impede abrir modal
+                onDownload();
+              }}
+              className="flex items-center gap-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+            >
+              <Download size={16} />
+              PDF
+            </button>
+          )}
+
+          {/* Excluir */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // ← impede abrir modal
+              onDelete();
+            }}
+            className="flex items-center gap-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+          >
+            <Trash2 size={16} />
+            Excluir
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
